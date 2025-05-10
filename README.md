@@ -496,32 +496,31 @@ rmse = mse ** 0.5
 Visualisasi dilakukan untuk membandingkan prediksi model terhadap data aktual pada periode pelatihan dan pengujian. Data produksi dikembalikan ke skala aslinya menggunakan inverse_transform sebelum divisualisasikan. Setiap grafik menunjukkan tren tahunan produksi komoditas dengan garis prediksi dan aktual untuk masing-masing negara dan komoditas, yang terbagi dalam dua subplot: pelatihan dan pengujian.
 
 Indonesia's Model Evaluation:
-![Visualizing forecast for Indonesia - Maize Production](repo-dir/visualizing_forecast_indonesia_maize_production.png)
-![Visualizing forecast for Indonesia - Rice Production](repo-dir/visualizing_forecast_indonesia_rice_production.png)
-![Visualizing forecast for Indonesia - Coffee green Production](repo-dir/visualizing_forecast_indonesia_coffee_green_production.png)
-![Visualizing forecast for Indonesia - Cocoa beans Production](repo-dir/visualizing_forecast_indonesia_cocoa_beans_production.png)
-![Visualizing forecast for Indonesia - Palm oil Production](repo-dir/visualizing_forecast_indonesia_palm_oil_production.png)
-
+![Visualizing forecast for Indonesia - Maize Production](repo-dir/visualizing-forecast-indonesia-maize-production.png)
+![Visualizing forecast for Indonesia - Rice Production](repo-dir/visualizing-forecast-indonesia-rice-production.png)
+![Visualizing forecast for Indonesia - Coffee green Production](repo-dir/visualizing-forecast-indonesia-coffee-green-production.png)
+![Visualizing forecast for Indonesia - Cocoa beans Production](repo-dir/visualizing-forecast-indonesia-cocoa-beans-production.png)
+![Visualizing forecast for Indonesia - Palm oil Production](repo-dir/visualizing-forecast-indonesia-palm-oil-production.png)
 
 Vietnam's Model Evaluation:
-![Visualizing forecast for Vietnam - Maize Production](repo-dir/visualizing_forecast_vietnam_maize_production.png)
-![Visualizing forecast for Vietnam - Rice Production](repo-dir/visualizing_forecast_vietnam_rice_production.png)
-![Visualizing forecast for Vietnam - Coffee green Production](repo-dir/visualizing_forecast_vietnam_coffee_green_production.png)
-![Visualizing forecast for Vietnam - Cocoa beans Production](repo-dir/visualizing_forecast_vietnam_cocoa_beans_production.png)
+![Visualizing forecast for Vietnam - Maize Production](repo-dir/visualizing-forecast-vietnam-maize-production.png)
+![Visualizing forecast for Vietnam - Rice Production](repo-dir/visualizing-forecast-vietnam-rice-production.png)
+![Visualizing forecast for Vietnam - Coffee green Production](repo-dir/visualizing-forecast-vietnam-coffee-green-production.png)
+![Visualizing forecast for Vietnam - Cocoa beans Production](repo-dir/visualizing-forecast-vietnam-cocoa-beans-production.png)
 
 Philippines Model Evaluation:
-![Visualizing forecast for Philippines - Maize Production](repo-dir/visualizing_forecast_philippines_maize_production.png)
-![Visualizing forecast for Philippines - Rice Production](repo-dir/visualizing_forecast_philippines_rice_production.png)
-![Visualizing forecast for Philippines - Coffee green Production](repo-dir/visualizing_forecast_philippines_coffee_green_production.png)
-![Visualizing forecast for Philippines - Cocoa beans Production](repo-dir/visualizing_forecast_philippines_cocoa_beans_production.png)
-![Visualizing forecast for Philippines - Palm oil Production](repo-dir/visualizing_forecast_philippines_palm_oil_production.png)
+![Visualizing forecast for Philippines - Maize Production](repo-dir/visualizing-forecast-philippines-maize-production.png)
+![Visualizing forecast for Philippines - Rice Production](repo-dir/visualizing-forecast-philippines-rice-production.png)
+![Visualizing forecast for Philippines - Coffee green Production](repo-dir/visualizing-forecast-philippines-coffee-green-production.png)
+![Visualizing forecast for Philippines - Cocoa beans Production](repo-dir/visualizing-forecast-philippines-cocoa-beans-production.png)
+![Visualizing forecast for Philippines - Palm oil Production](repo-dir/visualizing-forecast-philippines-palm-oil-production.png)
 
 Malaysia's Model Evaluation:
-![Visualizing forecast for Malaysia - Maize Production](repo-dir/visualizing_forecast_malaysia_maize_production.png)
-![Visualizing forecast for Malaysia - Rice Production](repo-dir/visualizing_forecast_malaysia_rice_production.png)
-![Visualizing forecast for Malaysia - Coffee green Production](repo-dir/visualizing_forecast_malaysia_coffee_green_production.png)
-![Visualizing forecast for Malaysia - Cocoa beans Production](repo-dir/visualizing_forecast_malaysia_cocoa_beans_production.png)
-![Visualizing forecast for Malaysia - Palm oil Production](repo-dir/visualizing_forecast_malaysia_palm_oil_production.png)
+![Visualizing forecast for Malaysia - Maize Production](repo-dir/visualizing-forecast-malaysia-maize-production.png)
+![Visualizing forecast for Malaysia - Rice Production](repo-dir/visualizing-forecast-malaysia-rice-production.png)
+![Visualizing forecast for Malaysia - Coffee green Production](repo-dir/visualizing-forecast-malaysia-coffee-green-production.png)
+![Visualizing forecast for Malaysia - Cocoa beans Production](repo-dir/visualizing-forecast-malaysia-cocoa-beans-production.png)
+![Visualizing forecast for Malaysia - Palm oil Production](repo-dir/visualizing-forecast-malaysia-palm-oil-production.png)
 
 ### Forecasting Results
 
@@ -529,17 +528,17 @@ Malaysia's Model Evaluation:
 
 Grafik ini membandingkan hasil prediksi produksi tahun 2030 untuk lima komoditas utama di lima negara ASEAN. Visualisasi menggunakan grouped bar chart untuk memperlihatkan performa masing-masing negara dalam setiap komoditas.
 
-![Forecasted Production in 2030 by Commodity (Indonesia vs Others)](repo-dir/forecasted_production_2030_by_commodity_indonesia_vs_others.png)
+![Forecasted Production in 2030 by Commodity (Indonesia vs Others)](repo-dir/forecasted-production-2030-by-commodity-indonesia-vs-others.png)
 
 #### Forecast Comparison (Until 2030)
 
 Melakukan prediksi produksi komoditas hingga tahun 2030 untuk setiap kombinasi negara dan komoditas yang tersedia. Model LSTM yang telah dilatih digunakan untuk menghasilkan prediksi berdasarkan 5 data terakhir dari gabungan data pelatihan dan pengujian. Output prediksi disimpan dalam struktur forecast_by_commodity dan divisualisasikan dalam bentuk grafik per komoditas untuk membandingkan tren antar negara.
 
-![Forecast Comparison Until 2030 - Maize Production](repo-dir/forecast_comparison_until_2030_maize_production.png)
-![Forecast Comparison Until 2030 - Rice Production](repo-dir/forecast_comparison_until_2030_rice_production.png)
-![Forecast Comparison Until 2030 - Coffee green Production](repo-dir/forecast_comparison_until_2030_coffee_green_production.png)
-![Forecast Comparison Until 2030 - Cocoa beans Production](repo-dir/forecast_comparison_until_2030_cocoa_beans_production.png)
-![Forecast Comparison Until 2030 - Palm oil Production](repo-dir/forecast_comparison_until_2030_palm_oil_production.png)
+![Forecast Comparison Until 2030 - Maize Production](repo-dir/forecast-comparison-until-2030-maize-production.png)
+![Forecast Comparison Until 2030 - Rice Production](repo-dir/forecast-comparison-until-2030-rice-production.png)
+![Forecast Comparison Until 2030 - Coffee green Production](repo-dir/forecast-comparison-until-2030-coffee-green-production.png)
+![Forecast Comparison Until 2030 - Cocoa beans Production](repo-dir/forecast-comparison-until-2030-cocoa-beans-production.png)
+![Forecast Comparison Until 2030 - Palm oil Production](repo-dir/forecast-comparison-until-2030-palm-oil-production.png)
 
 ---
 
