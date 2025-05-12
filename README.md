@@ -36,35 +36,44 @@ Solusi dilakukan dengan membangun **model LSTM univariat** yang hanya menggunaka
 
 **Masalah 1:**
 
-Tren produksi pertanian di negara-negara ASEAN sangat fluktuatif. Tanpa peramalan yang akurat, pemerintah dan pemangku kepentingan kesulitan menyusun strategi pangan dan perdagangan jangka panjang.
+Tren historis produksi pertanian di negara-negara ASEAN sangat fluktuatif. Tanpa peramalan yang akurat, pemerintah dan pemangku kepentingan di sektor pertanian kesulitan dalam merumuskan strategi pangan dan perdagangan jangka panjang.
 
 **Masalah 2:**
 
-Kurangnya prediksi standar yang membandingkan posisi Indonesia terhadap negara produsen utama ASEAN lainnya (Vietnam, Thailand, Filipina dan Malaysia) untuk komoditas strategis seperti jagung, beras, kopi, cokelat, dan minyak sawit.
+Belum tersedia standar perbandingan proyeksi produksi yang membandingkan posisi Indonesia dengan negara produsen utama ASEAN lainnya, seperti Vietnam, Thailand, dan Malaysia, untuk komoditas strategis seperti beras, kopi, dan minyak sawit.
 
 **Masalah 3:**
 
-Teknik peramalan tradisional (misalnya statistik dasar atau regresi linier) tidak cukup mampu menangkap pola musiman dan non-linier jangka panjang dalam data deret waktu pertanian.
+Teknik peramalan tradisional (misalnya statistik dasar atau regresi linier) sering kali gagal menangkap pola musiman dan non-linier dalam data deret waktu produksi pertanian jangka panjang.
 
 ### Goals
 
 **Tujuan 1 (untuk Masalah 1):**
 
-Membangun model **LSTM univariat** yang akurat untuk memprediksi produksi tahunan jagung, beras, kopi, coklat, dan minyak sawit dari 2022 hingga 2030 menggunakan data historis (1961–2021) per negara dan komoditas.
+Mengembangkan model **LSTM univariat yang akurat** untuk meramalkan produksi tahunan beras, kopi, dan minyak sawit dari tahun 2022 hingga 2030 menggunakan data historis (1961–2021) per negara dan komoditas.
 
 **Tujuan 2 (untuk Masalah 2):**
 
-Membandingkan hasil prediksi antar Indonesia, Vietnam, Thailand, Filipina dan Malaysia untuk setiap komoditas guna mengevaluasi posisi kompetitif Indonesia secara kuantitatif.
+Membandingkan hasil proyeksi produksi antara Indonesia, Vietnam, Thailand, dan Malaysia untuk masing-masing komoditas, guna mengevaluasi posisi daya saing Indonesia secara kuantitatif.
 
 **Tujuan 3 (untuk Masalah 3):**
 
-Menggunakan LSTM untuk memodelkan pola musiman dan non-linear dalam data produksi historis, sehingga meningkatkan akurasi dibandingkan model konvensional seperti rata-rata bergerak atau regresi linier.
+Menggunakan LSTM untuk memodelkan tren historis produksi yang non-linier dan musiman, sehingga meningkatkan akurasi peramalan dibandingkan model konvensional seperti moving average atau regresi linier.
 
 ### Solution Statements
 
-* Menggunakan **Long Short-Term Memory (LSTM)** karena kemampuannya dalam mempelajari pola jangka panjang pada data time series.
-* Menyusun preprocessing data berupa encoding, scaling, dan reshaping sebelum digunakan oleh model LSTM.
-* Melakukan **early stopping** untuk menghindari overfitting, serta membandingkan hasil prediksi aktual dan prediksi model menggunakan **RMSE** sebagai indikator akurasi.
+**Solusi 1:**
+
+Membangun **model LSTM univariat secara terpisah** untuk setiap kombinasi komoditas dan negara (total 12 model) menggunakan data produksi tahunan dari [World Food Production Dataset (Kaggle)](https://www.kaggle.com/datasets/rafsunahmad/world-food-production/data).
+
+Untuk mengukur performa peramalan:
+
+* **RMSE (Root Mean Squared Error)** – mengukur seberapa besar deviasi prediksi terhadap nilai aktual.
+* **MAE (Mean Absolute Error)** – mengukur rata-rata selisih absolut antara nilai prediksi dan nilai aktual.
+
+**Solusi 2:**
+
+Membandingkan dan memvisualisasikan hasil prediksi total produksi per kombinasi komoditas dan negara, sehingga para pemangku kepentingan dapat menilai posisi daya saing Indonesia di kawasan ASEAN.
 
 ## Data Understanding
 
@@ -162,29 +171,19 @@ Output:
 
 **Kesimpulan**: Dataset sepenuhnya bersih dengan **tidak ada nilai hilang** dan **duplikasi data** pada semua kolom, termasuk ketiga variabel target: **jagung**, **beras**, **kopi**, **cokelat** dan **minyak sawit**.
 
-### **ASEAN Country and Commodity Selection**
+### ASEAN Country and Commodity Selection
 
-Dari dataset lengkap **World Food Production**, proyek ini menyaring hanya lima negara ASEAN yang menjadi fokus — **Indonesia, Vietnam, Thailand, Filipina dan Malaysia** — serta memilih lima komoditas utama:
+Memfokuskan analisis pada lima negara ASEAN, yaitu Indonesia, Vietnam, Thailand, Filipina, dan Malaysia, serta pada komoditas tertentu yang relevan secara ekonomi dan produksi, yaitu jagung, beras, kopi, kakao, dan minyak sawit.
 
-* Jagung
-* Beras
-* Kopi (green)
-* Cokelat
-* Minyak Sawit
+Berikut adalah cuplikan data produksi tahunan lima komoditas utama di Indonesia (1961–1965) yang digunakan dalam proyek ini:
 
-Hanya kolom `Entity`, `Year`, dan ketiga nilai produksi komoditas yang dipertahankan.
-
-## Data Preparation
-
-### Langkah-langkah yang dilakukan:
-
-1. **Penyaringan Data**: Memilih data dari negara ASEAN dan 5 komoditas utama.
-2. **Encoding**: Label encoding pada fitur kategorikal seperti negara dan komoditas.
-3. **Transformasi**: Menggunakan transformasi logaritmik pada kolom `Value` untuk mengurangi outlier ekstrem.
-4. **Normalisasi**: Menggunakan `MinMaxScaler` agar nilai berada pada rentang 0-1.
-5. **Sequence Generation**: Membentuk data menjadi time series sequence untuk input LSTM.
-6. **Split Data**: Data dibagi menjadi train dan test dengan proporsi 80:20.
-7. **Bentuk sequence LSTM**: `look_back=5`
+| Year | Entity    | Maize Production (tonnes) | Rice Production (tonnes) | Coffee green Production (tonnes) | Cocoa beans Production (tonnes) | Palm oil Production (tonnes) |
+|------|-----------|----------------------------|----------------------------|----------------------------------|----------------------------------|-------------------------------|
+| 1961 | Indonesia | 2,283,100                  | 7,965,911                  | 47.05                            | 20,000                           | 21,602                        |
+| 1962 | Indonesia | 3,242,900                  | 8,694,623                  | 48.30                            | 28,000                           | 23,002                        |
+| 1963 | Indonesia | 2,357,800                  | 8,735,168                  | 46.38                            | 32,000                           | 24,802                        |
+| 1964 | Indonesia | 3,768,600                  | 9,371,189                  | 48.41                            | 35,000                           | 25,002                        |
+| 1965 | Indonesia | 2,364,500                  | 9,655,017                  | 48.48                            | 35,000                           | 27,202                        |
 
 ### Feature Renaming for Simplicity
 
@@ -205,68 +204,13 @@ df_filtered.head()
 
 Hasilnya:
 
-* `Coffee green Production`
-* `Palm oil Production`
-* `Cocoa beans Production`
-* `Rice Production`
-* `Maize Production`
-
-### Exploratory Data Analysis (EDA)
-
-#### Yearly Trend of Maize Production (1961–2021)
-
-Visualisasi ini menunjukkan tren produksi jagung dari tahun 1961 hingga 2021 di lima negara ASEAN terpilih. Jagung merupakan salah satu komoditas utama pangan dan pakan, sehingga pemantauan pertumbuhannya penting untuk mendukung ketahanan pangan.
-
-![Yearly Trend of Maize Production (1961–2021)](repo-dir/yearly-trend-maize-production.png)
-
-**Insight:**
-
-* Produksi jagung menunjukkan pertumbuhan stabil dari tahun ke tahun dengan tren kenaikan yang cukup konsisten.
-* Lonjakan signifikan mulai terlihat sejak tahun 2000-an, menunjukkan peningkatan perhatian terhadap komoditas ini.
-* Terjadi sedikit penurunan di tahun-tahun terakhir, yang bisa menjadi sinyal untuk evaluasi faktor produksi atau cuaca.
-
-#### Yearly Trend of Rice Production (1961–2021)
-
-Visualisasi ini merepresentasikan tren tahunan produksi beras di kawasan ASEAN. Beras menjadi makanan pokok bagi mayoritas penduduk Asia Tenggara, menjadikannya komoditas strategis untuk dipantau secara jangka panjang.
-
-![Yearly Trend of Rice Production (1961–2021)](repo-dir/yearly-trend-rice-production.png)
-
-**Insight:**
-
-* Produksi padi cenderung fluktuatif tetapi menunjukkan tren kenaikan jangka panjang yang kuat.
-* Terdapat penurunan tajam sekitar tahun 1967 dan beberapa fluktuasi tajam di era 1990–2000, mengindikasikan pengaruh faktor eksternal seperti kebijakan atau cuaca ekstrem.
-* Dalam dekade terakhir, tren terlihat meningkat kembali dengan volume produksi mencapai puncaknya pada tahun 2021.
-
-#### Yearly Trend of Coffee Production (1961–2021)
-
-Visualisasi ini menggambarkan dinamika produksi kopi tahunan yang sangat fluktuatif, dipengaruhi oleh faktor cuaca, harga global, dan kebijakan ekspor.
-
-![Yearly Trend of Coffee Production (1961–2021)](repo-dir/yearly-trend-coffee-green-production.png)
-
-**Insight:**
-
-* Produksi kopi sangat volatil, terutama sebelum tahun 2000, menunjukkan ketergantungan tinggi pada musim dan harga pasar global.
-* Lonjakan besar setelah tahun 2000 diikuti oleh fluktuasi tajam, menandakan potensi pertumbuhan yang besar tetapi juga risiko tinggi dalam stabilitas produksi.
-* Tidak terdapat pola pertumbuhan linear, yang memperkuat pentingnya penggunaan model prediktif untuk komoditas ini.
-
-![Yearly Trend of Cocoa Beans Production (1961–2021)](repo-dir/yearly-trend-cocoa-beans-production.png)
-
-**Insight:**
-
-* Produksi kakao mengalami pertumbuhan signifikan dari awal 1970-an hingga sekitar tahun 1980, namun disusul oleh penurunan tajam. Setelah tahun 1980, tren produksi cenderung fluktuatif, dengan periode stagnasi panjang hingga akhir 1990-an.
-* Kenaikan drastis kembali terjadi antara awal 2000-an hingga puncaknya di sekitar tahun 2008–2009.
-* Tren menunjukkan penurunan yang tidak konsisten, dengan beberapa kenaikan sementara namun tidak mencapai puncak sebelumnya.
-* Variabilitas tinggi dalam dua dekade terakhir mengindikasikan ketidakstabilan produksi kakao, yang dapat disebabkan oleh faktor eksternal seperti cuaca, hama tanaman, atau dinamika pasar global.
-
-####  Yearly Trend of Palm Oil Production (1961–2021)
-
-![Yearly Trend of Palm Oil Production (1961–2021)](repo-dir/yearly-trend-palm-oil-production.png)
-
-**Insight:**
-
-* Produksi minyak kelapa sawit menunjukkan peningkatan pesat pada era 1980–1990 yang kemudian diikuti penurunan tajam sekitar tahun 2000.
-* Terdapat fluktuasi besar pasca tahun 2000, termasuk anomali penurunan drastis yang mungkin berkaitan dengan kebijakan ekspor, regulasi, atau faktor lingkungan.
-* Kenaikan tajam pada tahun-tahun akhir grafik menunjukkan potensi rebound dalam industri kelapa sawit, meskipun dengan risiko volatilitas tinggi.
+| Year | Entity    | Maize Production | Rice Production | Coffee green Production | Cocoa beans Production | Palm oil Production |
+|------|-----------|------------------|------------------|--------------------------|--------------------------|----------------------|
+| 1961 | Indonesia | 2,283,100        | 7,965,911        | 47.05                    | 20,000                   | 21,602               |
+| 1962 | Indonesia | 3,242,900        | 8,694,623        | 48.30                    | 28,000                   | 23,002               |
+| 1963 | Indonesia | 2,357,800        | 8,735,168        | 46.38                    | 32,000                   | 24,802               |
+| 1964 | Indonesia | 3,768,600        | 9,371,189        | 48.41                    | 35,000                   | 25,002               |
+| 1965 | Indonesia | 2,364,500        | 9,655,017        | 48.48                    | 35,000                   | 27,202               |
 
 ---
 
@@ -277,6 +221,9 @@ Visualisasi ini menggambarkan dinamika produksi kopi tahunan yang sangat fluktua
 Proses ini menggunakan visualisasi boxplot untuk mengidentifikasi outlier pada lima komoditas utama. Boxplot membantu melihat sebaran data, median, kuartil, dan titik-titik ekstrem yang dianggap sebagai outlier berdasarkan rentang interkuartil.
 
 ```python
+commodities = ['Maize Production', 'Rice Production', 'Coffee green Production',
+               'Cocoa beans Production', 'Palm oil Production']
+
 plt.figure(figsize=(12, 6))
 
 for i, commodity in enumerate(commodities):
@@ -289,7 +236,7 @@ plt.show()
 ```
 
 Hasilnya seperti gambar berikut:
-![Checking Outliers](https://github.com/codedreamerD/MLT_1/blob/main/repo-dir/Checking-Outliers.png)
+![Checking Outliers](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Checking-Outliers.png)
 
 ### Handling Outliers
 
@@ -301,11 +248,18 @@ df_transformed = df_filtered.copy()
 for col in commodities:
     df_transformed[col] = np.log1p(df_transformed[col])
 
-df_transformed
+plt.figure(figsize=(12, 6))
+
+for i, commodity in enumerate(commodities):
+    plt.subplot(2, 3, i+1)
+    sns.boxplot(x=df_transformed[commodity], color='red')
+    plt.title(commodity)
+
+plt.tight_layout()
 ```
 
 Hasilnya ditunjukkan dalam gambar berikut:
-![Handling Outliers](https://github.com/codedreamerD/MLT_1/blob/main/repo-dir/Handling-Outliers.png)
+![Handling Outliers](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Handling-Outliers.png)
 
 ### Data Normalization
 
@@ -324,23 +278,51 @@ for col in commodities:
 df_normalized
 ```
 
+Berikut Data Produksi Pangan Ternormalisasi (Indonesia):
+
+| Entity     | Year | Maize Production | Rice Production | Coffee green Production | Cocoa beans Production | Palm oil Production |
+|------------|------|------------------|------------------|--------------------------|-------------------------|----------------------|
+| Indonesia  | 1961 | 0.686313         | 0.618756         | 0.055055                 | 0.659623                | 0.611591             |
+| Indonesia  | 1962 | 0.728914         | 0.627802         | 0.057219                 | 0.682033                | 0.615439             |
+| Indonesia  | 1963 | 0.690222         | 0.628283         | 0.053872                 | 0.690926                | 0.620056             |
+| Indonesia  | 1964 | 0.747151         | 0.635546         | 0.057407                 | 0.696895                | 0.620548             |
+| Indonesia  | 1965 | 0.690566         | 0.638630         | 0.057526                 | 0.696895                | 0.625716             |
+
 ### Data Splitting
 
-Membagi data masing-masing negara dan komoditas ke dalam subset pelatihan (train) dan pengujian (test) berdasarkan proporsi 80 persen untuk pelatihan dan 20 persen untuk pengujian. Data dibagi secara individual untuk setiap kombinasi negara dan komoditas, agar model nantinya dapat belajar dari pola spesifik masing-masing.
+Membagi data masing-masing negara dan komoditas ke dalam subset pelatihan (train) dan pengujian (test) berdasarkan proporsi 80% untuk pelatihan dan 20% untuk pengujian. Data dibagi secara individual untuk setiap kombinasi negara dan komoditas, agar model nantinya dapat belajar dari pola spesifik masing-masing.
 
-* **Training Set**: 80% tahun awal
-* **Testing Set**: 20% tahun akhir (hingga **2021**)
+| No | Country – Commodity                   | Train Length | Test Length | Total Years |
+|----|----------------------------------------|--------------|-------------|--------------|
+| 0  | Indonesia - Maize Production           | 48           | 13          | 61           |
+| 1  | Indonesia - Rice Production            | 48           | 13          | 61           |
+| 2  | Indonesia - Coffee green Production    | 48           | 13          | 61           |
+| 3  | Indonesia - Cocoa beans Production     | 48           | 13          | 61           |
+| 4  | Indonesia - Palm oil Production        | 48           | 13          | 61           |
+| 5  | Vietnam - Maize Production             | 48           | 13          | 61           |
+| 6  | Vietnam - Rice Production              | 48           | 13          | 61           |
+| 7  | Vietnam - Coffee green Production      | 48           | 13          | 61           |
+| 8  | Vietnam - Cocoa beans Production       | 48           | 13          | 61           |
+| 9  | Vietnam - Palm oil Production          | 48           | 13          | 61           |
+| 10 | Thailand - Maize Production            | 48           | 13          | 61           |
+| 11 | Thailand - Rice Production             | 48           | 13          | 61           |
+| 12 | Thailand - Coffee green Production     | 48           | 13          | 61           |
+| 13 | Thailand - Cocoa beans Production      | 48           | 13          | 61           |
+| 14 | Thailand - Palm oil Production         | 48           | 13          | 61           |
+| 15 | Philippines - Maize Production         | 48           | 13          | 61           |
+| 16 | Philippines - Rice Production          | 48           | 13          | 61           |
+| 17 | Philippines - Coffee green Production  | 48           | 13          | 61           |
+| 18 | Philippines - Cocoa beans Production   | 48           | 13          | 61           |
+| 19 | Philippines - Palm oil Production      | 48           | 13          | 61           |
+| 20 | Malaysia - Maize Production            | 48           | 13          | 61           |
+| 21 | Malaysia - Rice Production             | 48           | 13          | 61           |
+| 22 | Malaysia - Coffee green Production     | 48           | 13          | 61           |
+| 23 | Malaysia - Cocoa beans Production      | 48           | 13          | 61           |
+| 24 | Malaysia - Palm oil Production         | 48           | 13          | 61           |
 
 ### Data Reshape
 
-Data deret waktu diubah menjadi format sekuensial menggunakan pendekatan sliding window dengan `look_back = 5`, yang berarti model akan mempelajari lima tahun sebelumnya untuk memprediksi satu tahun berikutnya. Data kemudian direstrukturisasi menjadi bentuk tiga dimensi yang sesuai dengan input model LSTM, yaitu [samples, timesteps, features].
-
-```
-Input: [1961, 1962, 1963, 1964, 1965]
-Target: 1966
-```
-
-Kode:
+Data deret waktu diubah menjadi format sekuensial menggunakan pendekatan sliding window dengan `look_back = 5`, yang berarti model akan mempelajari lima tahun sebelumnya untuk memprediksi satu tahun berikutnya.
 
 ```python
 def create_sequences(series, look_back=5):
@@ -350,6 +332,34 @@ def create_sequences(series, look_back=5):
         y.append(series[i+look_back])
     return np.array(X), np.array(y)
 ```
+
+Berikut adalah 25 kombinasi unik antara negara ASEAN dan komoditas produksi yang tersedia dalam data hasil reshaping:
+
+- Indonesia - Maize Production  
+- Indonesia - Rice Production  
+- Indonesia - Coffee green Production  
+- Indonesia - Cocoa beans Production  
+- Indonesia - Palm oil Production  
+- Vietnam - Maize Production  
+- Vietnam - Rice Production  
+- Vietnam - Coffee green Production  
+- Vietnam - Cocoa beans Production  
+- Vietnam - Palm oil Production  
+- Thailand - Maize Production  
+- Thailand - Rice Production  
+- Thailand - Coffee green Production  
+- Thailand - Cocoa beans Production  
+- Thailand - Palm oil Production  
+- Philippines - Maize Production  
+- Philippines - Rice Production  
+- Philippines - Coffee green Production  
+- Philippines - Cocoa beans Production  
+- Philippines - Palm oil Production  
+- Malaysia - Maize Production  
+- Malaysia - Rice Production  
+- Malaysia - Coffee green Production  
+- Malaysia - Cocoa beans Production  
+- Malaysia - Palm oil Production
 
 ### Data Structure Verification
 
@@ -365,52 +375,48 @@ print("X_test shape:", reshaped_data[key]['X_test'].shape)
 print("y_test shape:", reshaped_data[key]['y_test'].shape)
 print("years_test shape:", reshaped_data[key]['years_test'].shape)
 ```
+
+Struktur Data untuk Pasangan: *Indonesia - Rice Production*
+
+- **X_train shape:** (43, 5, 1)  
+  Artinya terdapat 43 sampel pelatihan, masing-masing menggunakan 5 langkah waktu (tahun) sebagai input, dan 1 fitur (produksi tahunan).
+  
+- **y_train shape:** (43,)  
+  Label target yang berisi produksi pada tahun ke-6 dari setiap sequence.
+
+- **X_test shape:** (8, 5, 1)  
+  Terdapat 8 sampel pengujian dengan struktur yang sama: 5 tahun input untuk memprediksi tahun ke-6.
+
+- **y_test shape:** (8,)  
+  Label aktual untuk data pengujian.
+
+- **years_test shape:** (8,)  
+  Tahun-tahun yang diprediksi untuk evaluasi dan visualisasi hasil forecasting.
+
 ---
 
 ## Model Development
-Untuk setiap pasangan negara–komoditas, dibangun satu model LSTM yang dilatih menggunakan data historis produksi tahunan. Model mempelajari pola dalam 5 tahun terakhir (look_back = 5) untuk memprediksi produksi pada tahun berikutnya.
 
-Model ini dikonfigurasi sebagai berikut:
+Tujuan utama dari proyek ini adalah membangun model peramalan deret waktu yang mampu memprediksi produksi pertanian di masa depan secara akurat menggunakan data historis tahunan. Untuk itu, arsitektur **Long Short-Term Memory (LSTM)** dipilih karena kemampuannya dalam mempelajari pola dependensi temporal yang kompleks dalam data berurutan.
 
-* **1 lapisan LSTM dengan 50 unit:**
-  Lapisan ini digunakan untuk menangkap pola temporal dari data deret waktu tahunan. 50 unit neuron cukup untuk mempelajari variasi tren produksi tanpa overfitting pada dataset per negara.
+Metode statistik tradisional (seperti ARIMA atau eksponensial smoothing) sering kali kesulitan dalam menangani:
+- Tren yang bersifat non-linear
+- Dependensi jangka panjang
+- Volatilitas dalam data produksi pertanian
 
-* **Fungsi aktivasi ReLU:**
-  Digunakan karena bekerja efektif pada data numerik dan mempercepat konvergensi model dengan menghindari masalah vanishing gradient.
+LSTM, yang merupakan turunan dari Recurrent Neural Networks (RNN), sangat cocok untuk peramalan deret waktu karena menggunakan *memory cells* yang mampu menyimpan informasi sepanjang urutan data yang lebih panjang [1].
 
-* **Lapisan output Dense(1):**
-  Menghasilkan satu nilai prediksi (produksi tahun ke-n), sesuai dengan sifat regresi univariat.
+Untuk setiap pasangan negara–komoditas, dibangun satu model **LSTM univariat** yang dilatih menggunakan jendela data produksi tahunan selama 5 tahun (setelah transformasi log dan normalisasi).
 
-* **Fungsi kerugian MSE (Mean Squared Error):**
-  Mengukur rata-rata kuadrat selisih antara prediksi dan nilai aktual. Cocok digunakan dalam tugas regresi seperti prediksi produksi.
-
-* **Optimizer ADAM:**
-  Digunakan karena efisien dan bekerja baik di berbagai jenis data, termasuk data time series seperti produksi tahunan.
-
-* **EarlyStopping:**
-  Model dilatih maksimal 100 epoch, namun dapat berhenti lebih awal jika tidak ada perbaikan nilai loss selama 10 epoch berturut-turut (patience=10), dengan toleransi perubahan minimal 0.001.
-
-**Untuk Proses Training:**
-
-* Model dilatih untuk setiap pasangan negara-komoditas yang tersedia dalam reshaped_data.
-* Output model berupa:
-  * **model terlatih**
-  * **prediksi pada data uji (y_pred)**
-  * **nilai MSE dan RMSE** sebagai metrik evaluasi
+- **Bentuk input**: `(jumlah sampel, 5, 1)`  
+- **Arsitektur Layer**:
+  - `LSTM(units=50, activation='relu')`
+  - `Dense(units=1)`
+- **Fungsi Loss**: Mean Squared Error (MSE)  
+- **Optimizer**: Adam  
+- **EarlyStopping**: Diaktifkan dengan `patience=10` dan `min_delta=0.001` untuk mencegah overfitting
 
 ### Train LSTM Model
-
-* Epoch hingga 100, dengan early stopping aktif
-* Batch size: 16
-
-```python
-model = Sequential()
-model.add(LSTM(50, activation='relu', input_shape=(look_back, 1)))
-model.add(Dense(1))
-model.compile(optimizer='adam', loss='mse')
-```
-
-### Train Procedure
 
 Setiap model LSTM dilatih menggunakan 80% data urutan pertama, sementara 20% sisanya digunakan untuk pengujian. EarlyStopping diterapkan berdasarkan training loss:
 
@@ -455,98 +461,132 @@ rmse = mse ** 0.5
 
 ### Performa Model
 
-| Negara    | Komoditas    | MSE      | RMSE      |
-| --------- | ------------ | -------- | --------- |
-| Indonesia | Jagung       | 0.056678 | **0.238** |
-| Indonesia | Beras        | 0.021462 | **0.146** |
-| Indonesia | Kopi (green) | 0.185553 | **0.431** |
-| Indonesia | Kakao        | 0.480563 | **0.693** |
-| Indonesia | Minyak sawit | 0.446703 | **0.668** |
-| Vietnam   | Jagung       | 0.036487 | **0.191** |
-| Vietnam   | Beras        | 0.063330 | **0.252** |
-| Vietnam   | Kopi (green) | 6.172344 | **2.484** |
-| Vietnam   | Kakao        | 0.874812 | **0.935** |
-| Vietnam   | Minyak sawit | 6.881076 | **2.623** |
-| Thailand  | Jagung       | 0.037853 | **0.195** |
-| Thailand  | Beras        | 1.779169 | **1.334** |
-| Thailand  | Kopi (green) | 1.237864 | **1.113** |
-| Thailand  | Kakao        | 0.333705 | **0.578** |
-| Thailand  | Minyak sawit | 0.039493 | **0.199** |
-| Filipina  | Jagung       | 0.051686 | **0.227** |
-| Filipina  | Beras        | 6.890931 | **2.625** |
-| Filipina  | Kopi (green) | 2.795318 | **1.672** |
-| Filipina  | Kakao        | 4.237350 | **2.058** |
-| Filipina  | Minyak sawit | 1.237029 | **1.112** |
-| Malaysia  | Jagung       | 0.397197 | **0.630** |
-| Malaysia  | Beras        | 0.069078 | **0.263** |
-| Malaysia  | Kopi (green) | 3.332711 | **1.826** |
-| Malaysia  | Kakao        | 7.442635 | **2.728** |
-| Malaysia  | Minyak sawit | 2.842913 | **1.686** |
+| Country – Commodity                       | MSE       | RMSE     |
+|-------------------------------------------|-----------|----------|
+| Indonesia - Maize Production              | 0.050252  | 0.224171 |
+| Indonesia - Rice Production               | 0.263076  | 0.512909 |
+| Indonesia - Coffee green Production       | 0.205936  | 0.453801 |
+| Indonesia - Cocoa beans Production        | 0.507351  | 0.712286 |
+| Indonesia - Palm oil Production           | 0.649066  | 0.805646 |
+| Vietnam - Maize Production                | 0.066647  | 0.258160 |
+| Vietnam - Rice Production                 | 0.025524  | 0.159763 |
+| Vietnam - Coffee green Production         | 6.988265  | 2.643533 |
+| Vietnam - Cocoa beans Production          | 1.423242  | 1.192997 |
+| Vietnam - Palm oil Production             | 7.717517  | 2.778042 |
+| Thailand - Maize Production               | 0.083865  | 0.289595 |
+| Thailand - Rice Production                | 1.928680  | 1.388769 |
+| Thailand - Coffee green Production        | 1.193851  | 1.092635 |
+| Thailand - Cocoa beans Production         | 0.806272  | 0.897926 |
+| Thailand - Palm oil Production            | 0.229946  | 0.479527 |
+| Philippines - Maize Production            | 0.074949  | 0.273768 |
+| Philippines - Rice Production             | 7.849365  | 2.801672 |
+| Philippines - Coffee green Production     | 2.776699  | 1.666343 |
+| Philippines - Cocoa beans Production      | 4.253852  | 2.062487 |
+| Philippines - Palm oil Production         | 1.547647  | 1.244044 |
+| Malaysia - Maize Production               | 0.271657  | 0.521207 |
+| Malaysia - Rice Production                | 0.066827  | 0.258509 |
+| Malaysia - Coffee green Production        | 1.037524  | 1.018589 |
+| Malaysia - Cocoa beans Production         | 7.988416  | 2.826379 |
+| Malaysia - Palm oil Production            | 2.874464  | 1.695424 |
 
-**Insight & Interpretasi**
+**Insight**
 
-* 🇮🇩 **Indonesia** menunjukkan performa terbaik secara keseluruhan, terutama untuk **beras** dengan **RMSE = 0.146**, diikuti oleh jagung (**0.238**) dan kopi (**0.431**). Ini menunjukkan pola produksi yang stabil dan dapat diprediksi.
-* 🇻🇳 **Vietnam** memiliki performa sangat baik untuk jagung dan beras, tetapi sangat buruk untuk kopi dan kelapa sawit (**RMSE > 2.5**), menunjukkan pola produksi yang tidak stabil atau historis yang fluktuatif.
-* 🇹🇭 **Thailand** menunjukkan performa sedang hingga baik. Jagung dan kelapa sawit diprediksi dengan sangat akurat (**RMSE < 0.2**), sedangkan beras dan kopi menunjukkan error yang lebih tinggi.
-* 🇵🇭 **Filipina** menunjukkan prediksi yang buruk untuk beras (**RMSE = 2.625**) dan kakao (**RMSE = 2.058**), yang mengindikasikan ketidakstabilan data historis atau noise yang tinggi.
-* 🇲🇾 **Malaysia** memiliki performa yang bervariasi, dengan prediksi jagung dan beras yang cukup akurat (**RMSE < 0.7**), tetapi buruk untuk kopi dan kakao (**RMSE > 1.8**), menandakan fluktuasi tinggi dalam produksi tahunan.
+* 🇮🇩 **Indonesia** menunjukkan performa prediksi yang baik secara keseluruhan. Produksi jagung (**RMSE = 0.224**) dan beras (**0.513**) termasuk dalam kategori akurat. Meskipun performa prediksi untuk kopi, kakao, dan minyak sawit masih memiliki error sedang hingga tinggi, model cukup mampu menangkap tren produksinya.
+
+* 🇻🇳 **Vietnam** memiliki performa sangat baik untuk beras (**RMSE = 0.160**) dan jagung (**0.258**), namun performa prediksi untuk kopi (**RMSE = 2.644**) dan minyak sawit (**2.778**) sangat buruk. Ini mengindikasikan data historis produksi yang sangat fluktuatif untuk dua komoditas terakhir tersebut.
+
+* 🇹🇭 **Thailand** memperlihatkan performa yang bervariasi. Jagung (**RMSE = 0.290**) dan kelapa sawit (**0.480**) cukup akurat. Namun, tingkat error yang lebih tinggi terdapat pada prediksi beras (**1.389**) dan kopi (**1.093**), yang mungkin disebabkan oleh fluktuasi musiman atau ketidakteraturan data.
+
+* 🇵🇭 **Filipina** mengalami kesulitan pada prediksi beras (**RMSE = 2.802**) dan kakao (**2.062**), yang menunjukkan ketidakstabilan pola produksi. Sementara itu, prediksi untuk jagung (**0.274**) tergolong akurat, memberikan indikasi bahwa tidak semua komoditas sulit diprediksi.
+
+* 🇲🇾 **Malaysia** memiliki akurasi prediksi yang cukup baik untuk beras (**RMSE = 0.259**) dan jagung (**0.521**), namun performa menurun drastis untuk kakao (**2.826**) dan minyak sawit (**1.695**). Hal ini menunjukkan bahwa beberapa komoditas di Malaysia memiliki pola produksi yang tidak konsisten atau terdapat noise signifikan dalam datanya.
 
 ### Visual Evaluation
 
 Visualisasi dilakukan untuk membandingkan prediksi model terhadap data aktual pada periode pelatihan dan pengujian. Data produksi dikembalikan ke skala aslinya menggunakan inverse_transform sebelum divisualisasikan. Setiap grafik menunjukkan tren tahunan produksi komoditas dengan garis prediksi dan aktual untuk masing-masing negara dan komoditas, yang terbagi dalam dua subplot: pelatihan dan pengujian.
 
 Indonesia's Model Evaluation:
-![Indonesia - Maize Production](repo-dir/Indonesia-Maize-Evaluation.png)
-![Indonesia - Rice Production](repo-dir/Indonesia-Rice-Evaluation.png)
-![Indonesia - Coffee Green Production](repo-dir/Indonesia-CoffeeGreen-Evaluation.png)
-![Indonesia - Cocoa Beans Production](repo-dir/Indonesia-Cocoa-Evaluation.png)
-![Indonesia - Palm Oil Production](repo-dir/Indonesia-PalmOil-Evaluation.png)
+![Indonesia - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Indonesia-Maize-Evaluation.png)
+![Indonesia - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Indonesia-Rice-Evaluation.png)
+![Indonesia - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Indonesia-Coffee-green-Evaluation.png)
+![Indonesia - Cocoa Beans Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Indonesia-Cocoa-beans-Evaluation.png)
+![Indonesia - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Indonesia-Palm-oil-Evaluation.png)
 
 Vietnam's Model Evaluation:
-![Vietnam - Maize Production](repo-dir/Vietnam-Maize-Evaluation.png)
-![Vietnam - Rice Production](repo-dir/Vietnam-Rice-Evaluation.png)
-![Vietnam - Coffee Green Production](repo-dir/Vietnam-CoffeeGreen-Evaluation.png)
-![Vietnam - Cocoa Beans Production](repo-dir/Vietnam-Cocoa-Evaluation.png)
-![Vietnam - Palm Oil Production](repo-dir/Vietnam-PalmOil-Evaluation.png)
+![Vietnam - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Vietnam-Maize-Evaluation.png)
+![Vietnam - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Vietnam-Rice-Evaluation.png)
+![Vietnam - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Vietnam-Coffee-green-Evaluation.png)
+![Vietnam - Cocoa Beans Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Vietnam-Coffee-beans-Evaluation.png)
+![Vietnam - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Vietnam-Palm-oil-Evaluation.png)
 
 Thailand's Model Evaluation:
-![Thailand - Maize Production](repo-dir/Thailand-Maize-Evaluation.png)
-![Thailand - Rice Production](repo-dir/Thailand-Rice-Evaluation.png)
-![Thailand - Coffee Green Production](repo-dir/Thailand-CoffeeGreen-Evaluation.png)
-![Thailand - Cocoa Beans Production](repo-dir/Thailand-Cocoa-Evaluation.png)
-![Thailand - Palm Oil Production](repo-dir/Thailand-PalmOil-Evaluation.png)
+![Thailand - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Thailand-Maize-Evaluation.png)
+![Thailand - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Thailand-Rice-Evaluation.png)
+![Thailand - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Thailand-Coffee-green-Evaluation.png)
+![Thailand - Cocoa Beans Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Thailand-Cocoa-beans-Evaluation.png)
+![Thailand - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Thailand-Palm-oil-Evaluation.png)
 
 Philippines Model Evaluation:
-![Philippines - Maize Production](repo-dir/Philippines-Maize-Evaluation.png)
-![Philippines - Rice Production](repo-dir/Philippines-Rice-Evaluation.png)
-![Philippines - Coffee Green Production](repo-dir/Philippines-CoffeeGreen-Evaluation.png)
-![Philippines - Cocoa Beans Production](repo-dir/Philippines-Cocoa-Evaluation.png)
-![Philippines - Palm Oil Production](repo-dir/Philippines-PalmOil-Evaluation.png)
+![Philippines - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Philippines-Maize-Evaluation.png)
+![Philippines - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Philippines-Rice-Evaluation.png)
+![Philippines - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Philippines-Coffee-green-Evaluation.png)
+![Philippines - Cocoa Beans Production]https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Philippines-Cocoa-beans-Evaluation.png()
+![Philippines - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Philippines-Palm-oil-Evaluation.png)
 
 Malaysia's Model Evaluation:
-![Malaysia - Maize Production](repo-dir/Malaysia-Maize-Evaluation.png)
-![Malaysia - Rice Production](repo-dir/Malaysia-Rice-Evaluation.png)
-![Malaysia - Coffee Green Production](repo-dir/Malaysia-CoffeeGreen-Evaluation.png)
-![Malaysia - Cocoa Beans Production](repo-dir/Malaysia-Cocoa-Evaluation.png)
-![Malaysia - Palm Oil Production](repo-dir/Malaysia-PalmOil-Evaluation.png)
+![Malaysia - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Malaysia-Maize-Evaluation.png)
+![Malaysia - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Malaysia-Rice-Evaluation.png)
+![Malaysia - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Malaysia-Coffee-green-Evaluation.png)
+![Malaysia - Cocoa Beans Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Malaysia-Cocoa-beans-Evaluation.png)
+![Malaysia - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Malaysia-Palm-oil-Evaluation-Palm-oil-Evaluation.png)
 
 ### Forecasting Results
+
+Berikut adalah tabel prediksi produksi tahun 2030 berdasarkan hasil model LSTM:
+
+| Country     | Commodity               | Forecast 2030 | From Year | To Year |
+| ----------- | ----------------------- | ------------- | --------- | ------- |
+| Vietnam     | Cocoa beans Production  | 24.375193     | 2022      | 2030    |
+| Indonesia   | Cocoa beans Production  | 16.617132     | 2022      | 2030    |
+| Philippines | Cocoa beans Production  | 10.681157     | 2022      | 2030    |
+| Thailand    | Cocoa beans Production  | 10.132552     | 2022      | 2030    |
+| Malaysia    | Cocoa beans Production  | 9.965827      | 2022      | 2030    |
+| Thailand    | Coffee green Production | 14.207090     | 2022      | 2030    |
+| Malaysia    | Coffee green Production | 11.917822     | 2022      | 2030    |
+| Philippines | Coffee green Production | 9.949503      | 2022      | 2030    |
+| Indonesia   | Coffee green Production | 9.729990      | 2022      | 2030    |
+| Vietnam     | Coffee green Production | 8.684875      | 2022      | 2030    |
+| Indonesia   | Maize Production        | 17.465925     | 2022      | 2030    |
+| Philippines | Maize Production        | 16.924751     | 2022      | 2030    |
+| Thailand    | Maize Production        | 16.212734     | 2022      | 2030    |
+| Vietnam     | Maize Production        | 14.704633     | 2022      | 2030    |
+| Malaysia    | Maize Production        | 10.316228     | 2022      | 2030    |
+| Philippines | Palm oil Production     | 14.456854     | 2022      | 2030    |
+| Vietnam     | Palm oil Production     | 12.826477     | 2022      | 2030    |
+| Indonesia   | Palm oil Production     | 11.666230     | 2022      | 2030    |
+| Thailand    | Palm oil Production     | 11.150445     | 2022      | 2030    |
+| Malaysia    | Palm oil Production     | 9.997130      | 2022      | 2030    |
+| Indonesia   | Rice Production         | 21.746363     | 2022      | 2030    |
+| Thailand    | Rice Production         | 15.662460     | 2022      | 2030    |
+| Malaysia    | Rice Production         | 15.208253     | 2022      | 2030    |
+| Vietnam     | Rice Production         | 14.594819     | 2022      | 2030    |
+| Philippines | Rice Production         | 13.804643     | 2022      | 2030    |
 
 ####  Bar Chart Visualization
 
 Grafik ini membandingkan hasil prediksi produksi tahun 2030 untuk lima komoditas utama di lima negara ASEAN. Visualisasi menggunakan grouped bar chart untuk memperlihatkan performa masing-masing negara dalam setiap komoditas.
 
-![Forecasted Production in 2030](repo-dir/Barchart-Prediction-2030.png)
+![Forecasted Production in 2030](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Barchart-Prediction-2030.png)
 
 #### Forecast Comparison (Until 2030)
 
 Melakukan prediksi produksi komoditas hingga tahun 2030 untuk setiap kombinasi negara dan komoditas yang tersedia. Model LSTM yang telah dilatih digunakan untuk menghasilkan prediksi berdasarkan 5 data terakhir dari gabungan data pelatihan dan pengujian. Output prediksi disimpan dalam struktur forecast_by_commodity dan divisualisasikan dalam bentuk grafik per komoditas untuk membandingkan tren antar negara.
 
-![Forecast - Maize Production](repo-dir/Forecast-Maize-Until-2030.png)
-![Forecast - Rice Production](repo-dir/Forecast-Rice-Until-2030.png)
-![Forecast - Coffee Green Production](repo-dir/Forecast-CoffeeGreen-Until-2030.png)
-![Forecast - Cocoa Beans Production](repo-dir/Forecast-Cocoa-Until-2030.png)
-![Forecast - Palm Oil Production](repo-dir/Forecast-PalmOil-Until-2030.png)
+![Forecast - Maize Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Forecast-Maize-Until-2030.png)
+![Forecast - Rice Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Forecast-Rice-Until-2030.png)
+![Forecast - Coffee Green Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Forecast-Coffee-green-Until-2030.png)
+![Forecast - Cocoa Beans Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Forecast-Cocoa-beans-Until-2030.png)
+![Forecast - Palm Oil Production](https://github.com/codedreamerD/MLT1/blob/main/repo-dir/Forecast-Palm-oil-Until-2030.png)
 
 ---
 
@@ -555,68 +595,45 @@ Melakukan prediksi produksi komoditas hingga tahun 2030 untuk setiap kombinasi n
 ### Apakah model menjawab setiap problem statement?
 
 **Masalah 1:**
+*Tren historis produksi pertanian di negara-negara ASEAN sangat fluktuatif. Tanpa peramalan yang akurat, pemerintah dan pemangku kepentingan di sektor pertanian kesulitan dalam merumuskan strategi pangan dan perdagangan jangka panjang.*
 
-> *Tren produksi pertanian di negara-negara ASEAN sangat fluktuatif dan sulit diprediksi tanpa alat yang akurat.*
-
-**Terjawab.**
-Model LSTM yang dikembangkan mampu mempelajari pola musiman dan non-linear dalam data historis produksi tahunan dari lima negara ASEAN. Hal ini terbukti dari RMSE yang rendah pada beberapa kombinasi.
+* Terjawab.
+  Model LSTM univariat yang dikembangkan berhasil mempelajari pola musiman dan non-linear dalam data produksi tahunan dari lima negara ASEAN untuk lima komoditas utama. Hasil evaluasi menggunakan RMSE menunjukkan bahwa model mampu memberikan prediksi yang cukup akurat untuk beberapa negara dan komoditas, seperti beras di Vietnam (RMSE = 0.159) dan jagung di Indonesia (RMSE = 0.224).
 
 **Masalah 2:**
+*Belum tersedia standar perbandingan proyeksi produksi yang membandingkan posisi Indonesia dengan negara produsen utama ASEAN lainnya.*
 
-> *Tidak adanya standar prediksi untuk membandingkan posisi Indonesia dengan negara ASEAN lainnya.*
-
-**Terjawab.**
-Model berhasil dibuat untuk **setiap negara dan komoditas**, sehingga memungkinkan:
-
-* Perbandingan RMSE antar negara untuk satu komoditas
-* Visualisasi dan pemeringkatan posisi Indonesia dibandingkan Vietnam, Thailand, Filipina, dan Malaysia
+* Terjawab.
+  Proyek ini membangun total 25 model prediksi untuk setiap kombinasi negara dan komoditas, yang memungkinkan dilakukan perbandingan lintas negara secara kuantitatif menggunakan hasil prediksi produksi tahun 2030 dan nilai evaluasi RMSE/MSE. Hal ini memberikan wawasan mengenai posisi kompetitif Indonesia dalam produksi beras, jagung, dan komoditas lainnya.
 
 **Masalah 3:**
+*Teknik peramalan tradisional (misalnya statistik dasar atau regresi linier) sering kali gagal menangkap pola musiman dan non-linier dalam data deret waktu produksi pertanian jangka panjang.*
 
-> *Model konvensional tidak mampu menangkap pola non-linier dan musiman pada data pertanian.*
-
-**Terjawab.**
-Model LSTM univariat mampu menangkap ketidakteraturan pola yang sulit dideteksi oleh regresi linier atau model statistik sederhana.
-Ini terlihat pada keberhasilan model dalam memprediksi tren jangka panjang komoditas seperti jagung di Filipina dan kopi di Indonesia, dengan RMSE rendah.
-
----
+* Terjawab.
+  LSTM sebagai model berbasis Recurrent Neural Network mampu mengatasi keterbatasan teknik tradisional. Ini dibuktikan dengan performa model pada kombinasi tertentu seperti kopi hijau Thailand (RMSE = 1.09) dan minyak sawit Filipina (RMSE = 1.24), di mana model masih dapat mengikuti tren meski data historis cukup fluktuatif.
 
 ### Apakah model berhasil mencapai goals?
 
 **Tujuan 1:**
-
-Model LSTM berhasil dilatih menggunakan data 1961–2021 dan digunakan untuk memprediksi produksi 2022–2030.
+Model LSTM berhasil dibangun dan dilatih dengan data historis dari tahun 1961 hingga 2021, dan digunakan untuk memprediksi tren produksi lima komoditas di lima negara ASEAN hingga tahun 2030.
 
 **Tujuan 2:**
-
-Perbandingan antar negara berhasil dilakukan melalui hasil evaluasi numerik (RMSE) dan visualisasi.
+Perbandingan antar negara dan komoditas berhasil dilakukan melalui hasil evaluasi numerik (RMSE, MSE) serta prediksi 2030 yang disusun dalam tabel. Ini memungkinkan analisis daya saing antar negara seperti keunggulan Indonesia dalam produksi beras dan jagung, serta dominasi Vietnam dalam kakao.
 
 **Tujuan 3:**
+Model LSTM terbukti mampu menangkap pola musiman dan non-linier dalam data deret waktu pertanian. Hal ini menjadikan model ini lebih unggul dibanding model statistik konvensional, terutama pada data dengan fluktuasi tinggi seperti produksi kopi dan minyak sawit.
 
-Model LSTM terbukti mampu mengatasi keterbatasan model tradisional dalam mengenali pola non-linear dan musiman.
-
----
-
-### Apakah setiap solusi yang direncanakan berdampak?
+### Apakah solusi yang direncanakan berdampak?
 
 **Solusi 1:**
-
-Penggunaan LSTM terbukti efektif untuk menangani dataset deret waktu produksi tahunan. Model menunjukkan hasil yang lebih baik pada pola yang konsisten dan mampu beradaptasi pada pola yang fluktuatif.
+Model LSTM univariat menunjukkan efektivitasnya dalam memprediksi tren berdasarkan data tahunan. Model memberikan hasil yang baik pada pola konsisten (misalnya beras Indonesia) dan mampu beradaptasi dengan pola fluktuatif (misalnya kakao Vietnam).
 
 **Solusi 2:**
-
-Tahapan preprocessing dan penggunaan look_back terbukti penting dalam menyiapkan data agar model bisa belajar dengan optimal.
-
-**Solusi 3:**
-
-Penggunaan **early stopping** dan **evaluasi dengan RMSE** memberikan hasil yang lebih robust, mencegah overfitting, dan memudahkan interpretasi kesalahan prediksi.
-
----
+Visualisasi hasil prediksi serta evaluasi numerik berhasil memberikan gambaran yang jelas tentang posisi Indonesia dibanding negara ASEAN lain. Misalnya, Indonesia diproyeksikan memimpin produksi beras pada 2030, sedangkan Vietnam unggul dalam kakao.
 
 ### Kesimpulan
 
-Hasil evaluasi mendukung pemanfaatan model LSTM univariat sebagai alat bantu perencanaan pangan jangka panjang.
-Proyek ini **berhasil menjawab seluruh problem statement**, **mencapai semua goals yang ditetapkan**, dan **menghasilkan solusi yang berdampak nyata dalam konteks ketahanan pangan dan benchmarking regional ASEAN**.
+Evaluasi menunjukkan bahwa model LSTM univariat yang dibangun efektif dalam memprediksi tren produksi pangan di ASEAN. Seluruh pernyataan masalah berhasil dijawab, tujuan tercapai, dan solusi yang diusulkan memberikan dampak nyata. Proyek ini berpotensi menjadi alat bantu penting bagi perumusan kebijakan pangan dan perencanaan produksi jangka panjang di kawasan Asia Tenggara.
 
 ---
 
