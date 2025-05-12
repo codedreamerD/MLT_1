@@ -289,7 +289,7 @@ plt.show()
 ```
 
 Hasilnya seperti gambar berikut:
-![Checking Outliers](repo-dir/Checking-Outliers.png)
+https://github.com/codedreamerD/MLT_1/blob/main/repo-dir/Checking-Outliers.png
 
 ### Handling Outliers
 
@@ -305,7 +305,7 @@ df_transformed
 ```
 
 Hasilnya ditunjukkan dalam gambar berikut:
-![Handling Outliers](repo-dir/Handling_Outliers.png)
+https://github.com/codedreamerD/MLT_1/blob/main/repo-dir/Handling-Outliers.png
 
 ### Data Normalization
 
